@@ -1,11 +1,7 @@
-import PropTypes from 'prop-types'
-import React, { Component } from 'react'
-import NewsItem from './NewsItem'
-
-export class News extends Component {
-    static propTypes = {}
-
-    articles = [
+{
+    "status": "ok",
+    "totalResults": 6,
+    "articles": [
         {
             "source": {
                 "id": "abc-news-au",
@@ -85,30 +81,4 @@ export class News extends Component {
             "content": "Last week, we at ESPNcricinfo did something we have been thinking of doing for eight years now: pretend-live ball-by-ball commentary for a classic cricket match. We knew the result, yes, but we tried… [+6823 chars]"
         }
     ]
-
-    constructor() {
-        super();
-        console.log('HELLO I AM CONSTRUCTOR FORM NEWS.JS');
-        this.state = {
-            articles: this.articles,
-            loading: false
-        }
-    }
-
-    render() {
-        return (
-            <div className='container my-3'>
-                <h2>Dev News - Top HeadLines</h2>
-                <div className="row">
-                    {this.state.articles.map((element) => {
-                        return <div className="col-md-4" key={element.url}>
-                            <NewsItem title={element.title.slice(0, 45)} description={element.description.slice(0, 88)} imageUrl={element.urlToImage} newsUrl={element.url} />
-                        </div>
-                    })}
-                </div>
-            </div>
-        )
-    }
 }
-
-export default News
