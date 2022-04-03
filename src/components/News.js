@@ -100,15 +100,11 @@ export class News extends Component {
             <div className='container my-3'>
                 <h2>Dev News - Top HeadLines</h2>
                 <div className="row">
-                    <div className="col-md-4">
-                        <NewsItem title="my title" description="mydesc" imageUrl="https://live-production.wcms.abc-cdn.net.au/cca56ba98abb099854bbd695da8c7822?impolicy=wcms_crop_resize&cropH=2813&cropW=5000&xPos=0&yPos=260&width=862&height=485" newsUrl='TO DO' />
-                    </div>
-                    <div className="col-md-4">
-                        <NewsItem title="my title" description="mydesc" />
-                    </div>
-                    <div className="col-md-4">
-                        <NewsItem title="my title" description="mydesc" />
-                    </div>
+                    {this.state.articles.map((element) => {
+                        return <div className="col-md-4" key={element.url}>
+                            <NewsItem title={element.title.slice(0, 45)} description={element.description.slice(0, 88)} imageUrl={element.urlToImage} newsUrl={element.url} />
+                        </div>
+                    })}
                 </div>
             </div>
         )
