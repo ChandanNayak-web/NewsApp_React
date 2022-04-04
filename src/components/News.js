@@ -1,6 +1,7 @@
 import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import NewsItem from './NewsItem'
+import Spinner from './Spinner';
 
 export class News extends Component {
     static propTypes = {}
@@ -17,23 +18,30 @@ export class News extends Component {
     }
 
     async componentDidMount() {
-        let url = "https://newsapi.org/v2/top-headlines?country=in&category=sports&apiKey=5680b86b1fbc419d83531858b7427bec&pageSize=20";
+        let url = `https://newsapi.org/v2/top-headlines?country=in&category=sports&apiKey=5680b86b1fbc419d83531858b7427bec&pageSize=${this.props.pageSize}`;
+        this.setState({ loading: true });
         let data = await fetch(url);
         let parsedData = await data.json();
-        this.setState({ articles: parsedData.articles , totalResults: parsedData.totalResults })
+        this.setState({
+            articles: parsedData.articles,
+            totalResults: parsedData.totalResults,
+            loading: false
+        })
     }
 
     // for previous click
     handlePrevClick = async () => {
         console.log('ptrvious');
 
-        let url = `https://newsapi.org/v2/top-headlines?country=in&category=sports&apiKey=5680b86b1fbc419d83531858b7427bec&page=${this.state.page - 1}&pageSize=20`;
+        let url = `https://newsapi.org/v2/top-headlines?country=in&category=sports&apiKey=5680b86b1fbc419d83531858b7427bec&page=${this.state.page - 1}&pageSize=${this.props.pageSize}`;
+        this.setState({ loading: true });
         let data = await fetch(url);
         let parsedData = await data.json();
 
         this.setState({
             page: this.state.page - 1,
             articles: parsedData.articles,
+            loading: false,
         })
 
     }
@@ -43,17 +51,17 @@ export class News extends Component {
         console.log('next');
 
         // condition for when no of page greater than to totalResults then next will not working
-        if (this.state.page + 1 > Math.ceil(this.state.totalResults / 20)) {
+        if (!(this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize))) {
 
-        } else {
-            
-            let url = `https://newsapi.org/v2/top-headlines?country=in&category=sports&apiKey=5680b86b1fbc419d83531858b7427bec&page=${this.state.page + 1}&pageSize=20`;
+            let url = `https://newsapi.org/v2/top-headlines?country=in&category=sports&apiKey=5680b86b1fbc419d83531858b7427bec&page=${this.state.page + 1}&pageSize=${this.props.pageSize}`;
+            this.setState({ loading: true });
             let data = await fetch(url);
             let parsedData = await data.json();
-    
+
             this.setState({
                 page: this.state.page + 1,
-                articles: parsedData.articles
+                articles: parsedData.articles,
+                loading: false,
             })
         }
     }
@@ -61,9 +69,11 @@ export class News extends Component {
     render() {
         return (
             <div className='container my-3'>
-                <h2>Dev News - Top HeadLines</h2>
+                <h1 className="text-center">Dev News - Top HeadLines</h1>
+                {/* below conditon is if this.state.loading=true then show <Spinner /> */}
+                {this.state.loading && <Spinner />}
                 <div className="row">
-                    {this.state.articles.map((element) => {
+                    {!this.state.loading && this.state.articles.map((element) => {
                         return <div className="col-md-4" key={element.url}>
                             <NewsItem title={element.title ? element.title : ""} description={element.description ? element.description : ""} imageUrl={element.urlToImage} newsUrl={element.url} />
                         </div>
@@ -71,7 +81,7 @@ export class News extends Component {
                 </div>
                 <div className="container d-flex justify-content-between">
                     <button disabled={this.state.page <= 1} type="button" className="btn btn-sm btn-outline-dark" onClick={this.handlePrevClick}>&#x029CF; Previous</button>
-                    <button type="button" className="btn btn-sm btn-outline-dark mx-3" onClick={this.handleNextClick}>Next &#x029D0;</button>
+                    <button disabled={this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize)} type="button" className="btn btn-sm btn-outline-dark mx-3" onClick={this.handleNextClick}>Next &#x029D0;</button>
                 </div>
             </div>
         )
