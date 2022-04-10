@@ -2,6 +2,7 @@ import PropTypes from 'prop-types'
 import React, { Component } from 'react'
 import NewsItem from './NewsItem'
 import Spinner from './Spinner';
+import InfiniteScroll from "react-infinite-scroll-component";
 
 export class News extends Component {
     static propTypes = {
@@ -16,14 +17,21 @@ export class News extends Component {
         category: 'general'
     }
 
-    constructor() {
-        super();
+    // below function can capitalize the title
+    capitalizeFirstLetter = (string) => {
+        return string.charAt(0).toUpperCase() + string.slice(1);
+    }
+
+    constructor(props) {
+        super(props);
         console.log('HELLO I AM CONSTRUCTOR FORM NEWS.JS');
         this.state = {
             articles: [],
             loading: false,
-            page: 1
+            page: 1,
+            totalResults: 0
         }
+        document.title = `${this.capitalizeFirstLetter(this.props.category)} - Dev News`;
     }
 
     // below function updateName will work fethch API , set the loding functionality and do the all functionality by using news API
@@ -91,26 +99,49 @@ export class News extends Component {
         this.updateName();
     }
 
-    render() {
-        return (
-            <div className='container my-3'>
-                <h1 className="text-center">Dev News - Top HeadLines</h1>
-                {/* below conditon is if this.state.loading=true then show <Spinner /> */}
-                {this.state.loading && <Spinner />}
-                <div className="row">
-                    {!this.state.loading && this.state.articles.map((element) => {
-                        return <div className="col-md-4" key={element.url}>
-                            <NewsItem title={element.title ? element.title : ""} description={element.description ? element.description : ""} imageUrl={element.urlToImage} newsUrl={element.url} author={element.author} date={element.publishedAt} source={element.source.name} />
-                        </div>
-                    })}
-                </div>
-                <div className="container d-flex justify-content-between">
-                    <button disabled={this.state.page <= 1} type="button" className="btn btn-sm btn-outline-dark" onClick={this.handlePrevClick}>&#x029CF; Previous</button>
-                    <button disabled={this.state.page + 1 > Math.ceil(this.state.totalResults / this.props.pageSize)} type="button" className="btn btn-sm btn-outline-dark mx-3" onClick={this.handleNextClick}>Next &#x029D0;</button>
-                </div>
-            </div>
-        )
+    // fetchmoredata from API
+    fetchMoreData = async () => {
+        this.setState({ page: this.state.page + 1 })
+        const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5680b86b1fbc419d83531858b7427bec&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+        let data = await fetch(url);
+        let parsedData = await data.json();
+        this.setState({
+            articles: this.state.articles.concat(parsedData.articles),
+            totalResults: parsedData.totalResults,
+            loading: false,
+        })
     }
-}
+
+        render() {
+            return (
+                <div className='container my-3'>
+                    <h1 className="text-center">Dev News - Top {this.capitalizeFirstLetter(this.props.category)} HeadLines </h1>
+                    {/* below conditon is if this.state.loading=true then show <Spinner /> */}
+                    {this.state.loading && <Spinner />}
+
+                    {/* adding infinite scrollbar */}
+                    <InfiniteScroll
+                        dataLength={this.state.articles.length}
+                        next={this.fetchMoreData}
+                        hasMore={this.state.articles.length !== this.state.totalResults}
+                        loader={<Spinner />}
+                    >
+                        <div className='container'>
+                            <div className="row">
+                                {this.state.articles.map((element) => {
+                                    return <div className="col-md-4" key={element.url}>
+                                        <NewsItem title={element.title ? element.title : ""} description={element.description ? element.description : ""} imageUrl={element.urlToImage} newsUrl={element.url} author={element.author} date={element.publishedAt} source={element.source.name} />
+                                    </div>
+                                })}
+                            </div>
+
+                        </div>
+                    </InfiniteScroll>
+                    
+                </div>
+            )
+        }
+    }
+
 
 export default News
