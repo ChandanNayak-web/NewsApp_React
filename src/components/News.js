@@ -36,15 +36,19 @@ export class News extends Component {
 
     // below function updateName will work fethch API , set the loding functionality and do the all functionality by using news API
     async updateName() {
+        this.props.setProgress(10); // initially progress bar shows 10%
         const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5680b86b1fbc419d83531858b7427bec&page=${this.state.page}&pageSize=${this.props.pageSize}`;
         this.setState({ loading: true });
         let data = await fetch(url);
+        this.props.setProgress(40);
         let parsedData = await data.json();
+        this.props.setProgress(70);
         this.setState({
             articles: parsedData.articles,
             totalResults: parsedData.totalResults,
             loading: false
         })
+        this.props.setProgress(100); // finally progress bar shows 100%
     }
     async componentDidMount() {
         // let url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5680b86b1fbc419d83531858b7427bec&pageSize=${this.props.pageSize}`;
@@ -112,36 +116,36 @@ export class News extends Component {
         })
     }
 
-        render() {
-            return (
-                <div className='container my-3'>
-                    <h1 className="text-center">Dev News - Top {this.capitalizeFirstLetter(this.props.category)} HeadLines </h1>
-                    {/* below conditon is if this.state.loading=true then show <Spinner /> */}
-                    {this.state.loading && <Spinner />}
+    render() {
+        return (
+            <div className='container my-3'>
+                <h1 className="text-center">Dev News - Top {this.capitalizeFirstLetter(this.props.category)} HeadLines </h1>
+                {/* below conditon is if this.state.loading=true then show <Spinner /> */}
+                {this.state.loading && <Spinner />}
 
-                    {/* adding infinite scrollbar */}
-                    <InfiniteScroll
-                        dataLength={this.state.articles.length}
-                        next={this.fetchMoreData}
-                        hasMore={this.state.articles.length !== this.state.totalResults}
-                        loader={<Spinner />}
-                    >
-                        <div className='container'>
-                            <div className="row">
-                                {this.state.articles.map((element) => {
-                                    return <div className="col-md-4" key={element.url}>
-                                        <NewsItem title={element.title ? element.title : ""} description={element.description ? element.description : ""} imageUrl={element.urlToImage} newsUrl={element.url} author={element.author} date={element.publishedAt} source={element.source.name} />
-                                    </div>
-                                })}
-                            </div>
-
+                {/* adding infinite scrollbar */}
+                <InfiniteScroll
+                    dataLength={this.state.articles.length}
+                    next={this.fetchMoreData}
+                    hasMore={this.state.articles.length !== this.state.totalResults}
+                    loader={<Spinner />}
+                >
+                    <div className='container'>
+                        <div className="row">
+                            {this.state.articles.map((element) => {
+                                return <div className="col-md-4" key={element.url}>
+                                    <NewsItem title={element.title ? element.title : ""} description={element.description ? element.description : ""} imageUrl={element.urlToImage} newsUrl={element.url} author={element.author} date={element.publishedAt} source={element.source.name} />
+                                </div>
+                            })}
                         </div>
-                    </InfiniteScroll>
-                    
-                </div>
-            )
-        }
+
+                    </div>
+                </InfiniteScroll>
+
+            </div>
+        )
     }
+}
 
 
 export default News
