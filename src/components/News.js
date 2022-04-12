@@ -37,7 +37,7 @@ export class News extends Component {
     // below function updateName will work fethch API , set the loding functionality and do the all functionality by using news API
     async updateName() {
         this.props.setProgress(10); // initially progress bar shows 10%
-        const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=5680b86b1fbc419d83531858b7427bec&page=${this.state.page}&pageSize=${this.props.pageSize}`;
+        const url = `https://newsapi.org/v2/top-headlines?country=${this.props.country}&category=${this.props.category}&apiKey=${this.props.apiKey}&page=${this.state.page}&pageSize=${this.props.pageSize}`;
         this.setState({ loading: true });
         let data = await fetch(url);
         this.props.setProgress(40);
