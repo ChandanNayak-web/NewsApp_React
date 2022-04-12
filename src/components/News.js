@@ -11,7 +11,7 @@ const News =(props)=> {
     const [loading, setLoading] = useState(true);
     const [page, setPage] = useState(1);
     const [totalResults, setTotalResults] = useState(0);
-    // document.title = `${this.capitalizeFirstLetter(props.category)} - Dev News`;
+
 
     // below function can capitalize the title
     const capitalizeFirstLetter = (string) => {
@@ -38,8 +38,9 @@ const News =(props)=> {
     }
 
     useEffect(() => {
+        document.title = `${capitalizeFirstLetter(props.category)} - Dev News`;
         updateName();
-
+        // eslint-disable-next-line
     }, []);
 
 
@@ -86,8 +87,8 @@ const News =(props)=> {
 
     // fetchmoredata from API
     const fetchMoreData = async () => {
+        const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=5680b86b1fbc419d83531858b7427bec&page=${page+1}&pageSize=${props.pageSize}`;
         setPage(page + 1);
-        const url = `https://newsapi.org/v2/top-headlines?country=${props.country}&category=${props.category}&apiKey=5680b86b1fbc419d83531858b7427bec&page=${page}&pageSize=${props.pageSize}`;
         let data = await fetch(url);
         let parsedData = await data.json();
         setArticles(articles.concat(parsedData.articles))
@@ -98,7 +99,7 @@ const News =(props)=> {
 
         return (
             <div className='container my-3'>
-                <h1 className="text-center">Dev News - Top {capitalizeFirstLetter(props.category)} HeadLines </h1>
+                <h1 className="text-center" style={{marginTop: '80px'}}> Dev News - Top {capitalizeFirstLetter(props.category)} HeadLines </h1>
                 {/* below conditon is if this.state.loading=true then show <Spinner /> */}
                 {loading && <Spinner />}
 
